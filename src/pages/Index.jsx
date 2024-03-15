@@ -22,25 +22,23 @@ const Index = () => {
     });
   };
 
-  const mockReceiveEmails = useCallback(() => {
-    const subjects = ["Important: Action Required", "Your Order Confirmation", "New Message from a Friend", "Weekly Newsletter", "Discount Code Inside"];
-    const bodies = ["Please click the link below to verify your account.", "Thank you for your purchase! Your order will be shipped soon.", "Hey there! Just wanted to catch up. How have you been?", "Here are the latest updates and news from our team.", "Use the code SAVE20 to get 20% off your next order!"];
-
-    const newEmail = {
-      id: Math.random().toString(36).substring(2, 9),
-      subject: subjects[Math.floor(Math.random() * subjects.length)],
-      from: `${Math.random().toString(36).substring(2, 8)}@example.com`,
-      body: bodies[Math.floor(Math.random() * bodies.length)],
-    };
-    setEmails((prevEmails) => [...prevEmails, newEmail]);
-  }, []);
-
   useEffect(() => {
-    const timer = setInterval(() => {
-      mockReceiveEmails();
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, [mockReceiveEmails]);
+    const fetchEmails = async () => {
+      try {
+        const response = await fetch(`/api/emails?address=${email}`);
+        const data = await response.json();
+        setEmails(data);
+      } catch (error) {
+        console.error("Error fetching emails:", error);
+      }
+    };
+
+    if (email) {
+      fetchEmails();
+      const interval = setInterval(fetchEmails, 10000);
+      return () => clearInterval(interval);
+    }
+  }, [email]);
 
   const handleSelectEmail = useCallback(
     (email) => {
