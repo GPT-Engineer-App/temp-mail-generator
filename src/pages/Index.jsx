@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box, Heading, Text, Input, Button, Stack, useToast, Image } from "@chakra-ui/react";
 import { FaEnvelope, FaRandom } from "react-icons/fa";
-import EmailList from "../components/EmailList";
+import ReceivedEmails from "../components/ReceivedEmails";
 
 const Index = () => {
   const [email, setEmail] = useState("");
@@ -22,9 +22,29 @@ const Index = () => {
     });
   };
 
-  const handleSelectEmail = (email) => {
-    navigate(`/email/${email.id}`);
-  };
+  const mockReceiveEmails = useCallback(() => {
+    const newEmail = {
+      id: Math.random().toString(36).substring(2, 9),
+      subject: "Welcome to TempMail!",
+      from: "no-reply@tempmail.com",
+      body: "This is your first received email.",
+    };
+    setEmails((prevEmails) => [...prevEmails, newEmail]);
+  }, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      mockReceiveEmails();
+    }, 5000);
+    return () => clearTimeout(timer);
+  }, [mockReceiveEmails]);
+
+  const handleSelectEmail = useCallback(
+    (email) => {
+      navigate(`/email/${email.id}`);
+    },
+    [navigate],
+  );
 
   return (
     <Box maxWidth="800px" margin="auto" padding={8}>
@@ -38,7 +58,7 @@ const Index = () => {
           Generate Email
         </Button>
       </Stack>
-      <EmailList emails={emails} onSelectEmail={handleSelectEmail} />
+      <ReceivedEmails emails={emails} onSelectEmail={handleSelectEmail} />
       <Text fontSize="sm" color="gray.500" marginTop={8} textAlign="center">
         The generated email is temporary and will expire after a certain period.
       </Text>
