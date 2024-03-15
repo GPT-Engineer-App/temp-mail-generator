@@ -18,7 +18,11 @@ const EmailView = () => {
   }, [id]);
 
   if (!email) {
-    return <Text>Loading...</Text>;
+    return (
+      <Box maxWidth="800px" margin="auto" padding={8}>
+        <Text>Loading...</Text>
+      </Box>
+    );
   }
   return (
     <Box maxWidth="800px" margin="auto" padding={8}>
